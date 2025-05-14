@@ -15,7 +15,7 @@ class DocIntRepository(DocIntInterface):
 
     def __init__(self, doc_int_endpoint):
         # credential = DefaultAzureCredential()
-        credential = AzureKeyCredential("5zUCiMdRV1dAYM2Z21bD5Az47d2K3PEUCbVqtdTQ5UiWyzgMxt9iJQQJ99BBACYeBjFXJ3w3AAALACOGUFu1")
+        credential = AzureKeyCredential("8V9ZK1hQ2Egh08RL2sYI3aFKxWuybgLFHrbkST258s3uRKBkxzx7JQQJ99BEACYeBjFXJ3w3AAALACOG5R66")
         self.client = DocumentIntelligenceClient(doc_int_endpoint, credential)
         
     def formatear_fecha(self,fecha_str):
@@ -420,7 +420,25 @@ class DocIntRepository(DocIntInterface):
 
             poller = self.client.begin_analyze_document(model_id="prebuilt-read",body=filestream,pages="1-30")
             result: AnalyzeResult = poller.result()
-            return result.content
+               # 1) Contenido puro
+            content = result.content
+              # 2) Recopilar confidencias de líneas
+            line_confidences = []
+            for page in result.pages:
+                for word in page.words:  # cada línea es DocumentLine
+                    line_confidences.append(word.confidence)
+
+            # 4) Cálculo de promedios
+            avg_line_confidence = (
+                sum(line_confidences) / len(line_confidences)
+                if line_confidences else None
+            )
+           
+
+            return {
+                "content": content,
+                "average_page_confidence": avg_line_confidence,
+            }
 
         except Exception as e:
             logging.error(f"Error al ejecutar openai: {str(e)}")

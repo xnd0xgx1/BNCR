@@ -3,8 +3,9 @@
   "Values": {
     "AzureWebJobsStorage": "",
     "FUNCTIONS_WORKER_RUNTIME": "python",
-    "DOC_INT_KEY":"5zUCiMdRV1dAYM2Z21bD5Az47d2K3PEUCbVqtdTQ5UiWyzgMxt9iJQQJ99BBACYeBjFXJ3w3AAALACOGUFu1",
-    "DOC_INT_ENDPOINT":"https://trv-di-pru-iagarantias-001.cognitiveservices.azure.com/",
-    "AOI_ENDPOINT": "https://trv-oai-pru-iagarantias-001.openai.azure.com/"
+    "DOC_INT_KEY":"E8V9ZK1hQ2Egh08RL2sYI3aFKxWuybgLFHrbkST258s3uRKBkxzx7JQQJ99BEACYeBjFXJ3w3AAALACOG5R66",
+    "DOC_INT_ENDPOINT":"https://di-rg-tests.cognitiveservices.azure.com/",
+    "AOI_ENDPOINT": "https://oai-test-poc.openai.azure.com/",
+    "ST_CONNECTIONSTRING":"DefaultEndpointsProtocol=https;AccountName=rgtests9a3c;AccountKey=FSfVdxDiRtJQGeUF5v/kLFXFaauUFvhUKveaGVhkXnjbIm70Y/MpE4rPdNLTtIGIm65V9J2FJihJ+ASternngQ==;EndpointSuffix=core.windows.net"
   }
 }

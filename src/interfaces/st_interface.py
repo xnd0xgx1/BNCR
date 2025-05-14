@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 
-class AOIInterface(ABC):
+class STInterface(ABC):
     @abstractmethod
-    def Call(self, content):
+    def Save(self, content):
         pass
     @abstractmethod
-    def clean_json_string(self,s):
+    def Get(self,document_name):
         pass
    
    
