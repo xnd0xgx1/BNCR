@@ -4,21 +4,17 @@ from src.interfaces.st_interface import STInterface
 import logging
 import json
 from openpyxl import load_workbook
+from datetime import datetime
 class ModelService:
 
-    def __init__(self,azure_di:DocIntInterface,azure_oi: AOIInterface,azure_st: STInterface):
+    def __init__(self,azure_di:DocIntInterface,azure_oi: AOIInterface,azure_st: STInterface,base_url:str):
         self.azure_di = azure_di
         self.azure_oi = azure_oi
         self.azure_st = azure_st
+        self.base_url = base_url
 
     def process(self,filestream):
-        result = self.azure_di.Process(filestream=filestream)
-        return result
-    def getdocument(self,name):
-        result = self.azure_st.Get(document_name=name)
-        return result
-    def processfase2(self,filestream):
-        diresult = self.azure_di.ProcessFase2(filestream=filestream)
+        diresult = self.azure_di.Process(filestream=filestream)
         logging.warning(f"Result initilializing AOI")
         result = self.azure_oi.Call(content=diresult["content"])
         logging.warning(f"INFORECIVED: {result}")
@@ -58,12 +54,20 @@ class ModelService:
                 escribir_valores(hoja_bal, sec, dest_col=col)
         logging.warning("Almacenando datos")
         logging.warning("Guardando Excel")
-        # Guarda el archivo con los datos volcados
-        self.azure_st.Save("ResultadoMamalon.xlsx",wb)
-        logging.warning("Cambiando variables Excel")
+      
+        fecha_actual = datetime.now().strftime("%Y%m%d_%H%M%S")
+        nombre_archivo = f"{fecha_actual}.xlsx"
+
+        # Guardar el archivo en el storage
+        self.azure_st.Save(".xlsx", wb, nombre_archivo)
+
+        # Agregar resultados
         result["Calidad"] = diresult["average_page_confidence"]
-        result["URL"] = f"http://localhost:7071/api/excel?nombre=ResultadoMamalon.xlsx"
+        result["URL"] = f"{self.base_url}/api/excel?nombre={nombre_archivo}"
 
         # wb.save("resultadoExcel2.xlsx")
         return json.dumps(result)
-    
+
+    def getdocument(self,name):
+        result = self.azure_st.Get(document_name=name)
+        return result

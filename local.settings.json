@@ -6,6 +6,8 @@
     "DOC_INT_KEY":"E8V9ZK1hQ2Egh08RL2sYI3aFKxWuybgLFHrbkST258s3uRKBkxzx7JQQJ99BEACYeBjFXJ3w3AAALACOG5R66",
     "DOC_INT_ENDPOINT":"https://di-rg-tests.cognitiveservices.azure.com/",
     "AOI_ENDPOINT": "https://oai-test-poc.openai.azure.com/",
-    "ST_CONNECTIONSTRING":"DefaultEndpointsProtocol=https;AccountName=rgtests9a3c;AccountKey=FSfVdxDiRtJQGeUF5v/kLFXFaauUFvhUKveaGVhkXnjbIm70Y/MpE4rPdNLTtIGIm65V9J2FJihJ+ASternngQ==;EndpointSuffix=core.windows.net"
+    "ST_ACOUNNT_URL":"DefaultEndpointsProtocol=https;AccountName=rgtests9a3c;AccountKey=FSfVdxDiRtJQGeUF5v/kLFXFaauUFvhUKveaGVhkXnjbIm70Y/MpE4rPdNLTtIGIm65V9J2FJihJ+ASternngQ==;EndpointSuffix=core.windows.net",
+    "AOI_KEY":"3hGSnYd1k6XNIM22DA2vlyNI18NskqHowSIj8gqRV5hG1EpPe2xOJQQJ99ALACYeBjFXJ3w3AAABACOGOkcr",
+    "URL_BASE":"http://localhost:7071"
   }
 }

@@ -7,14 +7,15 @@ from src.interfaces.st_interface import STInterface
 from openpyxl import Workbook, load_workbook
 from openpyxl.workbook.workbook import Workbook as OpenpyxlWorkbook
 import io
+from azure.identity import DefaultAzureCredential
 
 
 class STRepository(STInterface):
-    def __init__(self,  storage_connection_string, container_name="documents"):
-        # Cliente para Document Intelligence
-        
-        # Cliente para Azure Blob Storage
-        self.blob_service_client = BlobServiceClient.from_connection_string(storage_connection_string)
+    def __init__(self,  account_url, container_name="documents"):
+        # credential = DefaultAzureCredential()
+        # self.blob_service_client = BlobServiceClient(account_url=account_url, credential=credential)
+        # self.container_name = container_name
+        self.blob_service_client = BlobServiceClient.from_connection_string(account_url)
         self.container_name = container_name
         
         try:

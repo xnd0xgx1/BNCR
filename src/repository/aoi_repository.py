@@ -9,9 +9,9 @@ class AOIRepository(AOIInterface):
 
    
 
-    def __init__(self, endpoint):
+    def __init__(self, endpoint,key):
         self.client = AzureOpenAI(
-            api_key="3hGSnYd1k6XNIM22DA2vlyNI18NskqHowSIj8gqRV5hG1EpPe2xOJQQJ99ALACYeBjFXJ3w3AAABACOGOkcr",  
+            api_key=key,  
             api_version="2024-12-01-preview",
             azure_endpoint = endpoint
             )
@@ -55,7 +55,7 @@ class AOIRepository(AOIInterface):
             messages=[
                 {
                     "role": "system",
-                    "content": """Eres un agente especializado en extracción de campos de estaods financieros, debes extraer siempre los siguientes campos en un json, RETORNA SOLO JSON siempre en un formato válido sin añadir o modificar los nombres de los campos SIEMPRE SERAN VALORES NUMERICOS EN CASO DE NO ENCONTRAR UNO RETORNA EL DEFAULT 0 EN EL CAMPO, IDENTIFICA TODOS LOS PERIODOS EN EL ESTADO FINANCIERO SIEMPRE SON AL MENOS 2, No coloquies numeros negativos solo el valor: 
+                    "content": """Eres un agente especializado en extracción de campos de estados financieros, debes extraer siempre los siguientes campos en un json, RETORNA SOLO JSON siempre en un formato válido sin añadir o modificar los nombres de los campos SIEMPRE SERAN VALORES NUMERICOS EN CASO DE NO ENCONTRAR UNO RETORNA EL DEFAULT 0 EN EL CAMPO, IDENTIFICA TODOS LOS PERIODOS EN EL ESTADO FINANCIERO SIEMPRE SON AL MENOS 2, No coloques numeros negativos solo el valor: 
                       {
                         "periodos": [
                             {

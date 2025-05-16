@@ -11,11 +11,13 @@ app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
 diendpoint = os.environ["DOC_INT_ENDPOINT"]
 oaiendpoint = os.environ["AOI_ENDPOINT"]
-stconn = os.environ["ST_CONNECTIONSTRING"]
+stconn = os.environ["ST_ACOUNNT_URL"]
+oai_key = os.environ["AOI_KEY"]
+base_url = os.environ["URL_BASE"]
 azuredi = DocIntRepository(doc_int_endpoint=diendpoint)
-azure_oi = AOIRepository(oaiendpoint)
+azure_oi = AOIRepository(oaiendpoint,oai_key)
 azure_st = STRepository(stconn)
-modelService = ModelService(azure_di=azuredi,azure_oi=azure_oi,azure_st=azure_st)
+modelService = ModelService(azure_di=azuredi,azure_oi=azure_oi,azure_st=azure_st,base_url=base_url)
 
 
 
@@ -31,7 +33,7 @@ def Process(req: func.HttpRequest) -> func.HttpResponse:
             file_stream = BytesIO(file_bytes)
 
             # Procesar el archivo
-            result = modelService.processfase2(file_stream)
+            result = modelService.process(file_stream)
 
             return func.HttpResponse(result, status_code=200, mimetype="application/json")
         else:
