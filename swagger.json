@@ -1,0 +1,94 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Document Processor API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/Process": {
+      "post": {
+        "summary": "Procesa archivos PDF",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file1": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo PDF a procesar"
+                  },
+                  "file2": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo PDF a procesar (opcional)"
+                  },
+                  "file3": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo PDF a procesar (opcional)"
+                  },
+                  "file4": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo PDF a procesar (opcional)"
+                  }
+                
+                },
+                "required": ["file1"]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Procesamiento exitoso"
+          },
+          "400": {
+            "description": "Error en la petición"
+          },
+          "500": {
+            "description": "Error interno del servidor"
+          }
+        }
+      }
+    },
+    "/api/excel": {
+      "get": {
+        "summary": "Obtiene un archivo Excel procesado",
+        "parameters": [
+          {
+            "name": "nombre",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Nombre del archivo a recuperar"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Archivo Excel descargado",
+            "content": {
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parámetros inválidos"
+          },
+          "500": {
+            "description": "Error del servidor"
+          }
+        }
+      }
+    }
+  }
+}

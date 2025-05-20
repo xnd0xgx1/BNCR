@@ -22,7 +22,7 @@ class DocIntRepository(DocIntInterface):
         try:
             logging.info(f"[DocIntRepository - process] - initialize")
 
-            poller = self.client.begin_analyze_document(model_id="prebuilt-read",body=filestream,pages="1-30")
+            poller = self.client.begin_analyze_document(model_id="prebuilt-read",body=filestream,pages="1-10")
             result: AnalyzeResult = poller.result()
                 # 1) Contenido puro
             content = result.content
@@ -38,7 +38,8 @@ class DocIntRepository(DocIntInterface):
                 if line_confidences else None
             )
             
-
+            logging.warning("Finalizando Respuestas de DI")
+            # logging.error(f"resultado {result.content}")
             return {
                 "content": content,
                 "average_page_confidence": avg_line_confidence,

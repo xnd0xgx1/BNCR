@@ -8,3 +8,5 @@ azure-identity
 openai
 openpyxl
 azure-storage-blob
+azure-cosmos
+python-multipart

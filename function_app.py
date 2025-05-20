@@ -2,10 +2,11 @@ import azure.functions as func
 import logging
 from src.services.Model_service import ModelService
 from src.repository.di_repository import DocIntRepository
+from src.repository.cosmos_repository import CosmosRepository
 from src.repository.aoi_repository import AOIRepository
 from src.repository.st_repository import STRepository
 import os
-from io import BytesIO
+import json
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -14,10 +15,13 @@ oaiendpoint = os.environ["AOI_ENDPOINT"]
 stconn = os.environ["ST_ACOUNNT_URL"]
 oai_key = os.environ["AOI_KEY"]
 base_url = os.environ["URL_BASE"]
+cosmos_url = os.environ["COSMOS_URL"]
+cosmos_key = os.environ["COSMOS_KEY"]
+azure_cosmos = CosmosRepository(cosmos_url=cosmos_url,cosmos_key=cosmos_key)
 azuredi = DocIntRepository(doc_int_endpoint=diendpoint)
 azure_oi = AOIRepository(oaiendpoint,oai_key)
 azure_st = STRepository(stconn)
-modelService = ModelService(azure_di=azuredi,azure_oi=azure_oi,azure_st=azure_st,base_url=base_url)
+modelService = ModelService(azure_di=azuredi,azure_oi=azure_oi,azure_st=azure_st,azure_cosmos=azure_cosmos,base_url=base_url)
 
 
 
@@ -27,17 +31,23 @@ def Process(req: func.HttpRequest) -> func.HttpResponse:
 
     try:
         content_type = req.headers.get('Content-Type', '')
-        if content_type == 'application/pdf':
-            logging.info("[ProcessDocument] - recibiendo PDF como cuerpo binario")
-            file_bytes = req.get_body()  # obtener el contenido binario del PDF
-            file_stream = BytesIO(file_bytes)
+        if 'multipart/form-data' not in content_type:
+            return func.HttpResponse(
+                "Tipo de contenido no soportado. Se espera multipart/form-data",
+                status_code=400
+            )
 
-            # Procesar el archivo
-            result = modelService.process(file_stream)
+        pdf_files = req.files
+        if pdf_files is None:
+            return func.HttpResponse(
+                "No se encontró el campo 'files' en la petición",
+                status_code=400
+            )       
 
-            return func.HttpResponse(result, status_code=200, mimetype="application/json")
-        else:
-            return func.HttpResponse("Tipo de contenido no soportado", status_code=400)
+        result = modelService.process(pdf_files)
+
+        return func.HttpResponse(result, status_code=200, mimetype="application/json")
+     
 
     except Exception as e:
         logging.error(f"Error procesando el documento: {str(e)}")
@@ -70,3 +80,19 @@ def GetExcel(req: func.HttpRequest) -> func.HttpResponse:
     except Exception as e:
         logging.error(f"Error al recuperar el documento: {str(e)}")
         return func.HttpResponse(f"Error: {str(e)}", status_code=500)
+
+@app.route(route="swagger", methods=["GET"])
+def swagger_json(req: func.HttpRequest) -> func.HttpResponse:
+    with open("swagger.json", "r") as f:
+        swagger_content = f.read()
+
+    return func.HttpResponse(
+        swagger_content,
+        mimetype="application/json"
+    )
+@app.route(route="docs", methods=["GET"])
+def docs_html(req: func.HttpRequest) -> func.HttpResponse:
+    with open("swagger.html", "r") as f:
+        html = f.read()
+
+    return func.HttpResponse(html, mimetype="text/html")

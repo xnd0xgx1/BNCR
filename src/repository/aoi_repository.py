@@ -49,89 +49,190 @@ class AOIRepository(AOIInterface):
 
         
     def Call(self,content):
-        logging.info(f"Content on AOI {content}")
+        logging.info(f"Content on AOI")
         response = self.client.chat.completions.create(
             model='gpt-4o',
             messages=[
                 {
                     "role": "system",
-                    "content": """Eres un agente especializado en extracción de campos de estados financieros, debes extraer siempre los siguientes campos en un json, RETORNA SOLO JSON siempre en un formato válido sin añadir o modificar los nombres de los campos SIEMPRE SERAN VALORES NUMERICOS EN CASO DE NO ENCONTRAR UNO RETORNA EL DEFAULT 0 EN EL CAMPO, IDENTIFICA TODOS LOS PERIODOS EN EL ESTADO FINANCIERO SIEMPRE SON AL MENOS 2, No coloques numeros negativos solo el valor: 
-                      {
-                        "periodos": [
-                            {
-                            "año": 2023,
-                            "estadoResultados": {
-                                "Ingresos": 1200000,
-                                "Costos": 700000,
-                                "Gastos": 100000,
-                                "Depreciación y Amortización": 50000,
-                                "Gastos de Venta": 30000,
-                                "Gastos de Administración": 20000,
-                                "Otros Gastos de Operación": 10000,
-                                "Gastos Financieros": 15000,
-                                "Producto Financiero": 5000,
-                                "Ingreso No Efectivo": 20000,
-                                "Otros Gastos": 8000,
-                                "Otros Ingresos": 12000,
-                                "Impuesto sobre la renta": 30000
-                            },
-                            "balanceGeneral": {
-                                "activosCirculantes": {
-                                "Caja o Bancos": 150000,
-                                "Inversiones en Valores": 50000,
-                                "Ctas y Docs por Cobrar Comerciales": 80000,
-                                "Inventario Terminado": 60000,
-                                "Otros Inventarios": 30000,
-                                "Otros Activos Circulantes": 20000
-                                },
-                                "activosNoCirculantes": {
-                                "Terreno": 100000,
-                                "Construcciones en Proceso": 50000,
-                                "Edificio y Mejoras": 250000,
-                                "Maquinaria, Mobiliario y Equipo": 200000,
-                                "Revaluación de Activos": 30000,
-                                "Otros Activos Fijos": 10000,
-                                "Depec. Acum. Histórica": 80000,
-                                "Cuentas por Cobrar L.P.": 40000,
-                                "Ctas. por Cobrar Socios": 20000,
-                                "Inversiones en Subsidiarias": 60000,
-                                "Otros Activos de Largo Plazo": 15000,
-                                "Activo Diferido": 10000
-                                },
-                                "pasivosCirculantes": {
-                                "Préstamos Bancarios de C.P.": 70000,
-                                "Porción Circulante Largo Plazo": 20000,
-                                "Ctas. por Pagar Proveedores": 60000,
-                                "Otras Cuentas por Pagar": 15000,
-                                "Imp/ Renta por Pagar": 10000,
-                                "Otros Pasivos de Corto Plazo": 8000
-                                },
-                                "pasivosLargoPlazo": {
-                                "Préstamos Bancarios de L.P.": 100000,
-                                "Ctas por Pagar Filiales L.P.": 20000,
-                                "Otros Pasivos de L.P.": 25000,
-                                "Pasivo Diferido": 12000
-                                },
-                                "capital": {
-                                "Capital Social": 300000,
-                                "Aportaciones por Capitalizar": 20000,
-                                "Reserva Legal": 10000,
-                                "Otros": 5000,
-                                "Superavit por Revaluación": 30000,
-                                "Utilidad (Pérdida) Acumulada": 50000,
-                                "Utilidad (Pérdida) de Período": 70000
-                                }
-                            }
-                            }
-                           
-                        ]
-                        }
+                    "content": """Descripción del agente
+Eres un agente especializado en extracción de campos de estados financieros. Debes procesar siempre estados de resultados y balances generales, identificando al menos dos periodos.
 
+Instrucciones Generales
+Salida exclusiva:
 
+Retorna sólo JSON en un formato válido.
 
+No añadas ni modifiques nombres de campos.
 
+No utilices comillas sencillas
 
-                    """,
+Valores numéricos:
+
+Todos los campos siempre serán valores numéricos NO COLOQUES SEPARACIONES EN LOS NUMEROS UNICAMENTE LOS VALORES.
+
+Si no encuentras un campo, retorna el valor 0 por defecto.
+
+No uses números negativos, sólo el valor absoluto.
+
+Agrupación y sumatoria:
+
+Si varios valores del documento corresponden a un mismo campo, súmalos e ingrésalos en ese campo.
+
+Periodos:
+
+Identifica todos los periodos presentes en el estado financiero (siempre al menos dos).
+
+Para cada periodo, extrae los datos de estado de resultados y balance general
+Formato de Salida
+json
+Copiar
+Editar
+{
+  "periodos": [
+    {
+      "año": <AÑO>,
+      "estadoResultados": {
+        "Ingresos": <NUMÉRICO>,
+        "Costos": <NUMÉRICO>,
+        "Gastos": <NUMÉRICO>,
+        "Depreciación y Amortización": <NUMÉRICO>,
+        "Gastos de Venta": <NUMÉRICO>,
+        "Gastos de Administración": <NUMÉRICO>,
+        "Otros Gastos de Operación": <NUMÉRICO>,
+        "Gastos Financieros": <NUMÉRICO>,
+        "Producto Financiero": <NUMÉRICO>,
+        "Ingreso No Efectivo": <NUMÉRICO>,
+        "Otros Gastos": <NUMÉRICO>,
+        "Otros Ingresos": <NUMÉRICO>,
+        "Impuesto sobre la renta": <NUMÉRICO>
+      },
+      "balanceGeneral": {
+        "activosCirculantes": {
+          "Caja o Bancos": <NUMÉRICO>,
+          "Inversiones en Valores": <NUMÉRICO>,
+          "Ctas y Docs por Cobrar Comerciales": <NUMÉRICO>,
+          "Inventario Terminado": <NUMÉRICO>,
+          "Otros Inventarios": <NUMÉRICO>,
+          "Otros Activos Circulantes": <NUMÉRICO>
+        },
+        "activosNoCirculantes": {
+          "Terreno": <NUMÉRICO>,
+          "Construcciones en Proceso": <NUMÉRICO>,
+          "Edificio y Mejoras": <NUMÉRICO>,
+          "Maquinaria, Mobiliario y Equipo": <NUMÉRICO>,
+          "Revaluación de Activos": <NUMÉRICO>,
+          "Otros Activos Fijos": <NUMÉRICO>,
+          "Depec. Acum. Histórica": <NUMÉRICO>,
+          "Cuentas por Cobrar L.P.": <NUMÉRICO>,
+          "Ctas. por Cobrar Socios": <NUMÉRICO>,
+          "Inversiones en Subsidiarias": <NUMÉRICO>,
+          "Otros Activos de Largo Plazo": <NUMÉRICO>,
+          "Activo Diferido": <NUMÉRICO>
+        },
+        "pasivosCirculantes": {
+          "Préstamos Bancarios de C.P.": <NUMÉRICO>,
+          "Porción Circulante Largo Plazo": <NUMÉRICO>,
+          "Ctas. por Pagar Proveedores": <NUMÉRICO>,
+          "Otras Cuentas por Pagar": <NUMÉRICO>,
+          "Imp/ Renta por Pagar": <NUMÉRICO>,
+          "Otros Pasivos de Corto Plazo": <NUMÉRICO>
+        },
+        "pasivosLargoPlazo": {
+          "Préstamos Bancarios de L.P.": <NUMÉRICO>,
+          "Ctas por Pagar Filiales L.P.": <NUMÉRICO>,
+          "Otros Pasivos de L.P.": <NUMÉRICO>,
+          "Pasivo Diferido": <NUMÉRICO>
+        },
+        "capital": {
+          "Capital Social": <NUMÉRICO>,
+          "Aportaciones por Capitalizar": <NUMÉRICO>,
+          "Reserva Legal": <NUMÉRICO>,
+          "Otros": <NUMÉRICO>,
+          "Superavit por Revaluación": <NUMÉRICO>,
+          "Utilidad (Pérdida) Acumulada": <NUMÉRICO>,
+          "Utilidad (Pérdida) de Período": <NUMÉRICO>
+        }
+      }
+    }
+    // … otros periodos …
+  ]
+}Glosario de Términos y Mapeos
+Activo Circulante / No Fijo / Corto Plazo
+Caja o Bancos: efectivo y equivalentes de efectivo (equivalente efectivo, caja, bancos).
+
+Inversiones en Valores: valores, instrumentos financieros, inversiones.
+
+Ctas y Docs por Cobrar Comerciales: CXC, documentos por cobrar comerciales, deudores comerciales.
+
+Inventario Terminado: inventario, existencias, productos terminados.
+
+Otros Inventarios: otros inventarios.
+
+Otros Activos Circulantes: pagos anticipados, anticipos a proveedores, gastos pagados anticipados, impuestos pagados por adelantado, pólizas, créditos fiscales, devoluciones de IVA.
+
+Activo No Circulante
+Terreno: terreno, propiedad, mejoras a terreno.
+
+Construcciones en Proceso: obras en curso, proyectos en desarrollo, construcciones en proceso.
+
+Edificio y Mejoras: planta, construcciones, mejoras a la propiedad, edificio, inmueble.
+
+Maquinaria, Mobiliario y Equipo: equipo, mobiliario, herramientas, vehículos, menaje, máquinas.
+
+Revaluación de Activos: revaluación.
+
+Otros Activos Fijos: otros activos, red telefónica, intangibles, software, licencias, activos menores.
+
+Depreciación Acumulada Histórica: depreciación.
+
+Cuentas por Cobrar L.P.: documentos por cobrar LP, cuentas por cobrar LP.
+
+Ctas. por Cobrar Socios: CxC accionistas, cuentas por cobrar a socios.
+
+Inversiones en Subsidiarias: cuentas por cobrar entre compañías, inversiones en negocios conjuntos.
+
+Otros Activos de Largo Plazo: otros activos LP, no corrientes.
+
+Activo Diferido: gastos pagados por adelantado, activo diferido.
+
+Pasivo Circulante / No Fijo / Corto Plazo
+Préstamos Bancarios de C.P.: tarjetas de crédito, líneas de crédito, pasivos de corto plazo.
+
+Porción Circulante Largo Plazo: porción corriente de la deuda, vencimiento a corto plazo.
+
+Ctas. por Pagar Proveedores: CXP proveedores, obligaciones comerciales.
+
+Otras Cuentas por Pagar: otras cuentas por pagar, intereses por pagar.
+
+Imp/ Renta por Pagar: impuesto sobre la renta, administración tributaria.
+
+Otros Pasivos de Corto Plazo: retenciones por pagar, gastos acumulados, provisiones.
+
+Pasivo No Circulante
+Préstamos Bancarios de L.P.: obligaciones LP, pasivos no corrientes.
+
+Ctas por Pagar Filiales L.P.: pasivo entre compañías, crédito asociado.
+
+Otros Pasivos de L.P.: provisiones LP, otros gastos acumulados.
+
+Pasivo Diferido: anticipos LP, pasivo por impuesto diferido.
+
+Patrimonio
+Capital Social: capital social, acciones comunes.
+
+Aportaciones por Capitalizar: aportaciones por capitalizar.
+
+Reserva Legal: reserva legal.
+
+Otros: otras reservas de capital.
+
+Superavit por Revaluación: ajuste por conversión de moneda, tipo de cambio.
+
+Utilidad (Pérdida) Acumulada: resultados acumulados de ejercicios anteriores.
+
+Utilidad (Pérdida) de Período: utilidad neta del ejercicio, resultado neto del período.
+  """,
                 },
                 {
                     "role": "user",

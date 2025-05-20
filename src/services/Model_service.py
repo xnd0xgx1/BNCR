@@ -1,23 +1,50 @@
 from src.interfaces.di_interface import DocIntInterface
 from src.interfaces.aoi_interface import AOIInterface
 from src.interfaces.st_interface import STInterface
+from src.interfaces.cosmos_interface import CosmosInterface
 import logging
 import json
 from openpyxl import load_workbook
 from datetime import datetime
+from io import BytesIO
 class ModelService:
 
-    def __init__(self,azure_di:DocIntInterface,azure_oi: AOIInterface,azure_st: STInterface,base_url:str):
+    def __init__(self,azure_di:DocIntInterface,azure_oi: AOIInterface,azure_st: STInterface,azure_cosmos: CosmosInterface,base_url:str):
         self.azure_di = azure_di
         self.azure_oi = azure_oi
         self.azure_st = azure_st
         self.base_url = base_url
+        self.azure_cosmos = azure_cosmos
 
-    def process(self,filestream):
-        diresult = self.azure_di.Process(filestream=filestream)
-        logging.warning(f"Result initilializing AOI")
-        result = self.azure_oi.Call(content=diresult["content"])
-        logging.warning(f"INFORECIVED: {result}")
+    def process(self,pdf_files):
+        contents = []
+        confidences = []
+
+        for file_name, file in pdf_files.items():
+            logging.info(f"Processing file: {file.filename}")
+            file_bytes = file.stream.read()
+            file_stream = BytesIO(file_bytes)
+            diresult = self.azure_di.Process(filestream=file_stream)
+
+            contents.append(diresult["content"])
+            confidences.append(diresult["average_page_confidence"])
+            logging.error(f"Confidences acumuladas: {confidences}")
+        
+        # # for pdf in pdfbytes:
+        # #     diresult = self.azure_di.Process(filestream=pdf)
+        # #     logging.warning("Apending results to Content")
+        # #     contents.append(diresult["content"])
+        # #     confidence.append(diresult["average_page_confidence"])
+        # #     logging.error(f"Contenido de conficencia: {confidence}")
+
+        resultadotextocompleto = ""
+        for content in contents:
+            resultadotextocompleto += content  
+          
+
+        logging.info(f"Texto completo resultante (longitud {len(resultadotextocompleto)}):")
+        result = self.azure_oi.Call(content=resultadotextocompleto)
+        # logging.warning(f"INFORECIVED: {result}")
         logging.warning("Procesando valores para excel")
         periodos = sorted(result["periodos"], key=lambda p: p["año"])[:4]  # antiguos a recientes, máximo 4
 
@@ -59,15 +86,21 @@ class ModelService:
         nombre_archivo = f"{fecha_actual}.xlsx"
 
         # Guardar el archivo en el storage
-        self.azure_st.Save(".xlsx", wb, nombre_archivo)
+        self.azure_st.Save(nombre_archivo,wb)
 
         # Agregar resultados
-        result["Calidad"] = diresult["average_page_confidence"]
-        result["URL"] = f"{self.base_url}/api/excel?nombre={nombre_archivo}"
+        result["Calidad"] = confidences
+        result["URL"] = f"{self.base_url}/api/excel?nombre={nombre_archivo}"    
+
+        #Guardar resultados en cosmos
+        
+      
+        item_creado = self.azure_cosmos.save_record(result)
+        print("Item creado:", item_creado)
+
 
         # wb.save("resultadoExcel2.xlsx")
         return json.dumps(result)
-
     def getdocument(self,name):
         result = self.azure_st.Get(document_name=name)
         return result
